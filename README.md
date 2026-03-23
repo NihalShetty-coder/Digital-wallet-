@@ -1,20 +1,47 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+Digital Wallet Dashboard
 
-# Run and deploy your AI Studio app
+A modern Digital Wallet web application that enables users to manage finances, perform secure transactions, and gain intelligent financial insights.
+Built using a scalable React + Firebase architecture, the system focuses on performance, real-time data handling, and clean user experience design.
 
-This contains everything you need to run your app locally.
+The platform simulates real-world fintech workflows such as wallet balance tracking, money transfers, deposits, financial analytics.
 
-View your app in AI Studio: https://ai.studio/apps/d336af5a-2ca4-42a2-b73f-d43981ba0c52
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+🚀 Core Features
+Secure authentication
+Real-time wallet balance tracking
+Peer-to-peer money transfers
+Deposit & transaction management
+Responsive modern fintech dashboard UI
+Animated transitions & smooth UX
+Scalable frontend architecture
+🧠 Tech Stack
+Frontend Core
+React 19 — Component-based modern UI architecture
+TypeScript — Strong type safety and maintainable code
+Vite 6 — Ultra-fast development & optimized builds
+Styling & UI
+Tailwind CSS 4 — Utility-first responsive styling
+Motion (Framer Motion) — Advanced UI animations & layout transitions
+Lucide React — Consistent SVG icon system
+clsx + tailwind-merge — Efficient dynamic class handling
+Backend & Services
+Firebase v12
+Authentication — Secure Google login & session handling
+Firestore — Real-time NoSQL database for wallet data
+State & Routing
+React Router DOM 7 — Client-side routing
+React Hooks — State & lifecycle management
+Utilities & Dev Tools
+date-fns — Transaction date formatting
+Express — Optional backend extension / API proxy
+ESLint + TypeScript Compiler — Code quality & error prevention
+🎯 Purpose of Project
+Demonstrate real-world fintech dashboard architecture
+Showcase modern React ecosystem expertise
+Practice scalable frontend system design
+Integrate AI into financial applications
+⭐ Future Enhancements
+Multi-currency wallet support
+Payment gateway integration
+Real-time notifications system
+Advanced AI financial forecasting
+Backend microservices architecture
