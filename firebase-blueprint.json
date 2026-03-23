@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user account information.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique Firebase Auth UID." },
+        "email": { "type": "string", "format": "email", "description": "User's email address." },
+        "displayName": { "type": "string", "description": "User's display name." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp." }
+      },
+      "required": ["uid", "email"]
+    },
+    "Account": {
+      "title": "Financial Account",
+      "description": "Stores account balance and currency information.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique account ID." },
+        "uid": { "type": "string", "description": "Owner's UID." },
+        "accountNumber": { "type": "string", "description": "12-digit account number." },
+        "currency": { "type": "string", "enum": ["USD", "EUR", "GBP", "JPY", "INR"], "description": "Account currency." },
+        "balance": { "type": "number", "description": "Current balance." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." }
+      },
+      "required": ["id", "uid", "accountNumber", "currency", "balance"]
+    },
+    "Transaction": {
+      "title": "Transaction Record",
+      "description": "Records of money transfers between accounts.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique transaction ID." },
+        "sourceAccountId": { "type": "string", "description": "ID of the source account." },
+        "destinationAccountId": { "type": "string", "description": "ID of the destination account." },
+        "sourceUid": { "type": "string", "description": "UID of the sender." },
+        "destinationUid": { "type": "string", "description": "UID of the recipient." },
+        "sourceEmail": { "type": "string", "description": "Email of the sender." },
+        "destinationEmail": { "type": "string", "description": "Email of the recipient." },
+        "amount": { "type": "number", "description": "Amount transferred." },
+        "currency": { "type": "string", "description": "Transaction currency." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Transaction timestamp." },
+        "description": { "type": "string", "description": "Optional note for the transaction." }
+      },
+      "required": ["id", "sourceAccountId", "destinationAccountId", "sourceUid", "destinationUid", "amount", "currency", "timestamp"]
+    },
+    "PaymentMethod": {
+      "title": "Payment Method",
+      "description": "Stored credit card or bank account information.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique method ID." },
+        "uid": { "type": "string", "description": "Owner's UID." },
+        "type": { "type": "string", "enum": ["CreditCard", "BankAccount"], "description": "Type of payment method." },
+        "details": { "type": "object", "description": "Encrypted or masked details." }
+      },
+      "required": ["id", "uid", "type", "details"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profile documents indexed by UID."
+    },
+    "/accounts/{accountId}": {
+      "schema": "Account",
+      "description": "Financial accounts for users."
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Global collection of all transactions."
+    },
+    "/paymentMethods/{methodId}": {
+      "schema": "PaymentMethod",
+      "description": "User's saved payment methods."
+    }
+  }
+}

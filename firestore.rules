@@ -1,0 +1,133 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Document ID: {uid}
+// Fields:
+//   - uid: string (required) - Firebase Auth UID
+//   - email: string (required) - User's email
+//   - displayName: string (optional) - User's name
+//   - createdAt: timestamp (required) - Creation time
+//
+// Collection: accounts
+// Document ID: {accountId}
+// Fields:
+//   - id: string (required) - Account ID
+//   - uid: string (required) - Owner UID
+//   - accountNumber: string (required) - Unique account number
+//   - currency: string (required) - USD, EUR, GBP, JPY
+//   - balance: number (required) - Current balance (>= 0)
+//   - createdAt: timestamp (required) - Creation time
+//
+// Collection: transactions
+// Document ID: {transactionId}
+// Fields:
+//   - id: string (required) - Transaction ID
+//   - sourceAccountId: string (required) - Source account ID
+//   - destinationAccountId: string (required) - Destination account ID
+//   - sourceUid: string (required) - Sender UID
+//   - destinationUid: string (required) - Recipient UID
+//   - sourceEmail: string (required) - Sender email
+//   - destinationEmail: string (required) - Recipient email
+//   - amount: number (required) - Transfer amount (> 0)
+//   - currency: string (required) - Transaction currency
+//   - timestamp: timestamp (required) - Transaction time
+//   - description: string (optional) - Note
+//
+// Collection: paymentMethods
+// Document ID: {methodId}
+// Fields:
+//   - id: string (required) - Method ID
+//   - uid: string (required) - Owner UID
+//   - type: string (required) - 'CreditCard' or 'BankAccount'
+//   - details: map (required) - Card/Bank details
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "nihalnshetty42@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+    
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidAccount(data) {
+      return hasRequiredFields(['id', 'uid', 'accountNumber', 'currency', 'balance', 'createdAt']) &&
+             data.uid == request.auth.uid &&
+             data.currency in ['USD', 'EUR', 'GBP', 'JPY', 'INR'] &&
+             data.balance is number && data.balance >= 0;
+    }
+
+    function isValidTransaction(data) {
+      return hasRequiredFields(['id', 'sourceAccountId', 'destinationAccountId', 'sourceUid', 'destinationUid', 'sourceEmail', 'destinationEmail', 'amount', 'currency', 'timestamp']) &&
+             data.amount is number && data.amount > 0 &&
+             (data.sourceUid == request.auth.uid || data.sourceUid == 'SYSTEM') &&
+             (data.sourceAccountId == 'SYSTEM_DEPOSIT' || exists(/databases/$(database)/documents/accounts/$(data.sourceAccountId)));
+    }
+
+    // User Profiles
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid) && isValidUser(request.resource.data);
+      allow update: if isOwner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']);
+    }
+
+    // Accounts
+    match /accounts/{accountId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidAccount(request.resource.data);
+      allow update: if isAuthenticated() && (
+        (resource.data.uid == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['balance'])) ||
+        isAdmin()
+      );
+    }
+
+    // Transactions
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.sourceUid == request.auth.uid || 
+        resource.data.destinationUid == request.auth.uid || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && isValidTransaction(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    // Payment Methods
+    match /paymentMethods/{methodId} {
+      allow read, create, delete: if isAuthenticated() && (
+        (request.resource.data.uid == request.auth.uid || (resource != null && resource.data.uid == request.auth.uid)) ||
+        isAdmin()
+      );
+      allow update: if false;
+    }
+  }
+}

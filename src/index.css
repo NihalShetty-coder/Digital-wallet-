@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-brand-blue: #3b82f6;
+  --color-brand-purple: #8b5cf6;
+  --color-brand-pink: #ec4899;
+  --color-dark-bg: #050505;
+  --color-dark-card: #0f0f0f;
+  --color-dark-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  @apply font-sans antialiased text-white bg-dark-bg;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display tracking-tight;
+}
+
+.glass-card {
+  @apply bg-dark-card border border-dark-border rounded-[2rem] backdrop-blur-xl;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink;
+}
+
+.gradient-border {
+  position: relative;
+  background: linear-gradient(var(--color-dark-card), var(--color-dark-card)) padding-box,
+              linear-gradient(to right, var(--color-brand-blue), var(--color-brand-purple)) border-box;
+  border: 1px solid transparent;
+}
+
+.glow-blue {
+  box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.3);
+}
+
+.glow-purple {
+  box-shadow: 0 0 40px -10px rgba(139, 92, 246, 0.3);
+}
